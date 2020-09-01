@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Framework for measuring   Excess of Mortality in LMICs</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucas Sempe &amp; Peter Lloyd-Sherlock" />
+    <link href="PAHO_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="PAHO_files/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="PAHO_files/kePrint-0.0.1/kePrint.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Framework for measuring <br> Excess of Mortality in LMICs
+## Application to case of Peru
+### Lucas Sempe &amp; Peter Lloyd-Sherlock
+### University of East Anglia
+### 01 September, 2020 <br> (Data: 24 August)
+
+---
+
+# Introduction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Important differences in **standardised mortality metrics** (deaths per pop/million or adjusted mortality rates) across similar regions and countries
+
++ Reporting deaths attributed to COVID-19 follows **varying protocols and criteria**
+
++ Estimating the significance of rising mortality rates over a specific period of time/place beyond recent data requires a **counterfactual** based on reliable data
+
+
+---
+
+# Data Challenges in LMICs (I) 
+
+   - **Data consistency** issues such as lack of registration over certain periods of time.
+   
+.center[  
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Data Challenges in LMICs (II) 
+
+ - **Unregistered deaths attributable to COVID-19** may exceed predicted excess mortality.
+ 
+.center[ 
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Data Challenges in LMICs (III) 
+
+ - **Historically unregistered deaths** affects mostly the accountability of older people.
+
+.center[
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Data Challenges in LMICs (IV) 
+
+   - **Poor crude mortality estimations** based on Census and permanent surveys could affect estimation excess mortality.
+   
+.center[
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+--- 
+
+# Data Challenges in LMICs (V) 
+
+- **(Real or artificial) seasonality** has to be addressed to understand data behaviour.
+
+.center[  
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Conceptual framework (I)
+
+Usually, computing **Excess Mortality** is based on **Registered deaths** analysis.
+
+.center[
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+# Conceptual framework (II)
+
+However, in most of LMICs we need also to address **two additional layers**:
+
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Empirical strategy (I)
+
+Our approach decomposes the estimation of **Total Excess of Deaths** `\(\text{Excess.d}_\text{T}\)` into three terms: **registered**, **unregistered**, and **unregistered COVID-19** deaths:
+
+`$$\small\widehat{\text{Excess.deaths}}_\text{Total} = \widehat{\text{Excess.deaths}}_\text{Regist}+{\text{Deaths}_\text{Not.regist}} + {\text{Deaths}_\text{COVID.Not.regist}}$$`
+
+-- 
+
++ We perform the analysis by **age groups** and **regions**.
+
++ We use two different sources of population and mortality data: **National Statistics** across years and **GBD**
+
++ Additionaly we use data from the SINADEF and MoH
+
+---
+
+# Empirical strategy (II) 
+
+To estimate the **first term** `\(\widehat{\text{Excess deaths}}_\text{Registered}\)`:
+
++ We fit **Bayesian time series models** using data prior to the pre-intervention and developing a synthetic conterfactual trend that would have occurred in a virtual scenario with no COVID.
+
+Our counterfactual is made from averaging means from 5,000 samples `\({\tau}\)` of posterior predictive distributions `\(\hat y_{t}\)`.
+
+The model uses posterior simulations to simulate posterior predictive distributions.
+
+Finally, using posterior predictive samples, we estimate the posterior distribution causal impact as `\({\text{y}_{Observerd}} -  \hat{\text{y}}_{Predicted}\)` for each time unit `\(\text{t}\)`.
+
++ More details about the method and the implementation `R` packages `CausalImpact` and `BSTS`.
+ 
+---
+
+# Empirical strategy (II)
+
+
+We perform **hypothesis tests** for each region to address if there are significant changes in the number of registered deaths `\(y_\text{t}\)` in time points `\(\text{t}\)` in comparison to the simulated conterfactual.
+
+`$$\begin{equation}
+  \label{eq:bayes}
+   \begin{cases}
+  H_0: \phi_{t}^{\tau}= y_{t} -  \hat y_{t}^{\tau} = 0 \\[1ex]
+  H_a: \phi_{t}^{\tau}= y_{t} -  \hat y_{t}^{\tau} \neq 0.
+   \end{cases}
+\end{equation}$$`
+
+---
+
+# Empirical strategy (IV)
+
+To assess the second term **unregistered deaths**:
+
+We rely on the assumption that under-registration in recent years is a reasonable counterfactual to estimate missing registration in 2020. 
+
+`$$\small{\text{Deaths}_\text{Not.registered}}=(1-\widehat{\text{Completness.registered}})*\widehat{\text{Excess.deaths}}_\text{Registered}$$`
+
+
+Where `\(\widehat{\text{Completness.register}}\)` refers to the completeness registration rate.
+
+
+
+---
+
+
+# Empirical strategy (V)
+
+We use time-series ARIMA and Drift models to estimate the completeness rate `\(\widehat{\text{Comp.reg}}\)`:
+
+`$$\small\widehat{\text{Completness.registered}}_\text{INEI}= \frac{\text{Deaths}_\text{Registered}}{\widehat{\text{Deaths}}_{{\text{Expected}}_{\text{INEI}}}}\pm  1.96\sqrt{\widehat{\text{MR}}*\widehat{\text{pop}}\sqrt{(\frac{\hat{\sigma}_\text{MR}}{\widehat{\text{MR}}})^2+(\frac{\hat{\sigma}_\text{pop}}{\widehat{\text{pop}}})^2}}$$`
+
+Where `\(\widehat{\text{MR}}\)` and `\(\widehat{\text{pop}}\)` refer to the ARIMA estimations of mortality rates and population, respectively.
+
+---
+# Empirical strategy (VI)
+
+Finally, the third term **unregistered COVID-19 deaths** is computed to correct for the proportion of cumulative cases of COVID-19 in cases they exceed the number of registered deaths over the period.
+
+`$$\small\text{If }\text{Deaths}_\text{COVID} \ge \text{Excess.d}_\text{Reg}, \text{then} \  {\text{Deaths}_\text{COVID Not.Reg}}=\text{COVID}_\text{Reg}-\widehat{\text{Excess.d}_\text{Reg}},\\[1ex]
+\ \text{else} \  {\text{Deaths}_\text{COVID Not.Reg}} = 0$$`
+  
+
+---
+
+# Results (I)
+
+Naive INEI counterfactual:
+
++ Excess Registered excess: **66,892** (CI uninformative)
+
++ Total excess: **~ 88,000 / 89,000** (95%CI 74,500-97,000)
+
+
+--
+
+
+Bayesian counterfactual:
+
++ Excess Registered excess: **64,388** (95%CI 60,682-68,100)
+
++ Total excess: **~ 82,000 / 83,000** (~ 95%CI 78,000-86,000)
+
+
+---
+
+# Results (II)
+
+&lt;table class="table table-hover" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Estimated of excess mortality: INEI, Bayesian - weeks 12 to 34&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; model.pop &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; model.mort &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total excess Bayes &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total Bayes Lower CI95% &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total Bayes Upper CI95% &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82697.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78034.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 85992.70 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82989.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78449.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86171.86 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83208.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78519.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86531.38 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83465.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78903.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86671.95 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;br&gt;
+--
+
+&lt;table class="table table-hover" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Estimated of excess mortality: INEI, Naive - weeks 12 to 34&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; model.pop &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; model.mort &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total excess Naive &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total Naive Lower CI95% &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total Naive Upper CI95% &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 88433.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74374.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 96700.57 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 88696.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74500.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97104.56 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 88982.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74931.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97242.72 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 89207.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75018.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97610.07 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Results (III)
+
+Bayesian GBD counterfactual:
+
++ Total excess: **~ 79,000 ** (~ 95%CI 75,000-79,000)
+
+Naive GBD counterfactual:
+
++ Total excess: **~ 84,000** (~95%CI 64,000-97,000)
+
+--
+
+&lt;table class="table table-hover" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Estimated of excess mortality: GBD, Bayes - weeks 12 to 34&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; model.GBD &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total excess Bayes &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total Bayes Lower CI95% &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total Bayes Upper CI95% &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78392.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75963.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78967.14 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78930.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76478.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79522.83 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;br&gt;
+
+--
+
+&lt;table class="table table-hover" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Estimated of excess mortality: GBD, Naive - weeks 12 to 34&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; model.GBD &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total excess GBD &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total GBD Lower CI95% &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Total GBD Upper CI95% &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; arima &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 84040.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 64052.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97861.50 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; drift &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 84621.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65886.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97190.08 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Results (IV)
+
++ COVID deaths in Ayacucho and Amazonas still don't affect lower estimation of total deaths.
+
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Results (V)
+
+Some regions of Peru were not be significantly affected by COVID-19 until recently. 
+
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Results (VI)
+
+Some cases (regions or age groups) with no solid evidence suggesting under-registration of deaths:
+
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Results (VII)
+
+Less deaths occurred due to a positive but unintended effect of quarantine or curfews (such as fewer road accidents or violent crimes). 
+
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Results (VIII)
+
+Standardised mortality varies significantly across regions shows states less populated and in coastal with higher values.
+
+&lt;img src="PAHO_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Discussion (I)
+
++ Different data challenges in terms of measurement are risks for inferential bias. 
+
++ Importance of understanding and addressing on a case-by-case basis
+
++ Addressing unregistered historical deaths allows addressing critical measurement bias
+
+--
+
++ Significant downward bias of COVID-19 deaths in official sources (less than 50% of the most conservative estimation of registered deaths)
+
+--
+
++ Bayes synthetic control accounts for trends and seasonality =&gt; more realistic estimations (in this case, -4-5% less than naive)
+
++ Bayes synthetic control provides reasonable and practical credible intervals for registered and total excess of deaths
+
+---
+
+# Discussion (II)
+
++ Time-series analysis to deal with missing datapoints (population and mortality rates) works in a logic of training and testing
+
++ Forecasting TS over longer periods provides uninformative wider CIs
+
++ GBD underestimates mortality, which leads to underestimation of COVID
+
+---
+
+class: center, middle
+
+**Thank you!**
+
+l.sempe@uea.ac.uk / p.lloyd-sherlock@uea.ac.uk
+
+https://github.com/lsempe77/Excess-Mortality
+
+
+
+&lt;img src="C:\Users\LUCAS\Desktop\Excess.deaths.PERU\logo.png" width="200" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
