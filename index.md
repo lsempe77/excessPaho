@@ -1,2 +1,2 @@
 
-[slide](\PAHO.html)
+[slide](/PAHO.html)
