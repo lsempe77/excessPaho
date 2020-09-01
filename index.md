@@ -1,2 +1,5 @@
+Excess mortality
 
-[slide link](excess/PAHO.html)
+Exercise of measuring mortality using time-series, demography and registration data.
+
+[Slides](excess/PAHO.html)
